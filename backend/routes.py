@@ -9,7 +9,8 @@ from pymongo.errors import OperationFailure
 from pymongo.results import InsertOneResult
 from bson.objectid import ObjectId
 import sys
-from db import get_collection
+from db_init import collection
+
 
 app = Flask(__name__)
 collection = get_collection()
@@ -21,7 +22,7 @@ data: list = json.load(open(json_url))
 client = MongoClient(os.environ['MONGODB_SERVICE'],
                         username=os.environ['MONGODB_USERNAME'],
                         password=os.environ['MONGODB_PASSWORD'])
-db = client['band']
+db = client['songs']
 collection = db['songs']
 #client = MongoClient('mongodb://%s:%s@127.0.0.1' % ('root', 'MzIyOTctZG9taW5p'))
 #client = MongoClient(
@@ -76,5 +77,14 @@ def count():
     count = collection.count_documents({})
     return jsonify({"count": count}), 200
 
+######################################################################
+# COUNT THE NUMBER OF SONGS
+######################################################################
+@app.route("/song", methods=["GET"])
+def get_songs():
+    songs = list(db.songs.find({}))  # Retrieve all documents from the 'songs' collection
+    formatted_songs = [{"_id": str(song['_id']), "title": song['title'], "lyrics": song['lyrics']} for song in songs]
+    return jsonify({"songs": formatted_songs}), 200
+
 if __name__ == "__main__":
-    app.run() 
+    app.run()
