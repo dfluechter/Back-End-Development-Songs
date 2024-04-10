@@ -73,8 +73,7 @@ def health():
 @app.route("/count", methods=["GET"])
 def count():
     """return length of data"""
-    collection = get_collection()
-    count = collection.count_documents({})
+    count = songs.count_documents({})
     return jsonify({"count": count}), 200
 
 ######################################################################
